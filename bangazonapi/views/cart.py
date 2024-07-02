@@ -1,5 +1,5 @@
 """View module for handling requests about customer shopping cart"""
-import datetime
+from datetime import date
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
@@ -26,9 +26,9 @@ class Cart(ViewSet):
         try:
             open_order = Order.objects.get(
                 customer=current_user, payment_type__isnull=True)
-        except Order.DoesNotExist as ex:
+        except Order.DoesNotExist:
             open_order = Order()
-            open_order.created_date = datetime.datetime.now()
+            open_order.created_date = date.today()
             open_order.customer = current_user
             open_order.save()
 
@@ -112,22 +112,27 @@ class Cart(ViewSet):
             open_order = Order.objects.get(
                 customer=current_user, payment_type=None)
 
-            products_on_order = Product.objects.filter(
-                lineitems__order=open_order)
+        except Order.DoesNotExist:
+            open_order = Order()
+            open_order.created_date = date.today()
+            open_order.customer = current_user
+            open_order.save()
 
-            serialized_order = OrderSerializer(
-                open_order, many=False, context={'request': request})
+            #return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
+        products_on_order = Product.objects.filter(
+            lineitems__order=open_order)
 
-            product_list = ProductSerializer(
-                products_on_order, many=True, context={'request': request})
+        serialized_order = OrderSerializer(
+            open_order, many=False, context={'request': request})
 
-            final = {
-                "order": serialized_order.data
-            }
-            final["order"]["products"] = product_list.data
-            final["order"]["size"] = len(products_on_order)
+        #product_list = ProductSerializer(
+            #products_on_order, many=True, context={'request': request})
 
-        except Order.DoesNotExist as ex:
-            return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
+        final = {
+            "order": serialized_order.data
+        }
+        #final["order"]["products"] = product_list.data
+        final["order"]["size"] = len(products_on_order)
+
 
         return Response(final["order"])
