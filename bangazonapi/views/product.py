@@ -104,13 +104,16 @@ class Products(ViewSet):
 
             new_product.image_path = data
 
-        new_product.save()
+        if new_product.price <= 17500:
+            new_product.save()
 
-        serializer = ProductSerializer(
-            new_product, context={'request': request})
+            serializer = ProductSerializer(
+                new_product, context={'request': request})
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response({'NO!'}, status=status.HTTP_400_BAD_REQUEST)
+    
     def retrieve(self, request, pk=None):
         """
         @api {GET} /products/:id GET product
