@@ -6,6 +6,7 @@ from rest_framework import status
 from bangazonapi.models import Order, Customer, Product, OrderProduct
 from .product import ProductSerializer
 from .order import OrderSerializer
+from .profile import LineItemSerializer
 
 
 class Cart(ViewSet):
@@ -36,8 +37,9 @@ class Cart(ViewSet):
         line_item.product = Product.objects.get(pk=request.data["product_id"])
         line_item.order = open_order
         line_item.save()
+        serializer = LineItemSerializer(line_item, many=False)
 
-        return Response({}, status=status.HTTP_204_NO_CONTENT)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
     def destroy(self, request, pk=None):
