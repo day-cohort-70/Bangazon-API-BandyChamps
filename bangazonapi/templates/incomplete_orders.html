@@ -1,0 +1,29 @@
+<!-- templates/report_template.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Report for Incomplete Orders</title>
+</head>
+<body>
+    <h1>Report for Incomplete Orders</h1>
+    <!-- Display the report data -->
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer Name</th>
+                <th>Order Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in orders %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.customer.user.first_name }} {{ item.customer.user.last_name }}</td>
+                    <td>${{ item.total }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
