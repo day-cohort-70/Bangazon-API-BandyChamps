@@ -119,8 +119,9 @@ class OrderTests(APITestCase):
         # Verify the order has the payment type assigned
         response = self.client.get(url, None, format='json')
         json_response = json.loads(response.content)
+        payment_id = int(json_response["payment_type"].rstrip('/').split('/')[-1])
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(json_response["payment_type"], self.payment_type)
+        self.assertEqual(payment_id, self.payment_type)
 
-    # TODO: New line item is not added to closed order
+    # TODO: New line item is not added to closed order  
